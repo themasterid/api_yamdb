@@ -25,3 +25,5 @@ urlpatterns = [
         name='redoc'
     ),
 ]
+
+# подправил для коммита
