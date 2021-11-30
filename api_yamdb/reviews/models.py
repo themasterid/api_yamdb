@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from datetime import datetime
 
 from django.contrib.auth.models import AbstractUser
@@ -40,10 +41,18 @@ class User(AbstractUser):
         max_length=150,
         unique=True
     )
+=======
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+
+
+class User(AbstractUser):
+>>>>>>> feature/develop
     bio = models.TextField(
         'Биография',
         blank=True,
     )
+<<<<<<< HEAD
     first_name = models.CharField(
         'Имя',
         max_length=150,
@@ -68,6 +77,22 @@ class User(AbstractUser):
     @property
     def is_user(self):
         return self.role == 'user'
+=======
+    role = models.TextField(
+        'Роль',
+        blank=True,
+        default="user",
+    ) 
+
+
+class Auth(models.Model):
+    email = models.EmailField(max_length=254)
+    username = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+    )
+>>>>>>> feature/develop
 
     @property
     def is_admin(self):
