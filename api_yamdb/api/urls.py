@@ -1,10 +1,7 @@
 from django.urls import include, path
 from rest_framework.routers import SimpleRouter
 
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
+from .views import UsersViewSet
 
 # TODO Как будут готовы раскомментить.
 # from .views import (APIGetToken, APISignup, CategoryViewSet, CommentsViewSet,
@@ -24,11 +21,14 @@ router.register(
     CommentsViewSet,
     basename='comments'
 )
+"""
+
 router.register(
     'users',
     UsersViewSet,
     basename='users'
 )
+"""
 router.register(
     'categories',
     CategoryViewSet,
