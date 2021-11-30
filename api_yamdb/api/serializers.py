@@ -1,7 +1,20 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
-from posts.models import Comment, Follow, Group, Post, User
+from reviews.models import Comment, Follow, Group, Post, User, Auth
+
+class AuthSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Auth
+        fields = '__all__'
+        validators = []
+
+    def validate(self, data):
+        if data['username'] == 'me':
+            raise serializers.ValidationError(
+                'Такое имя запрещено')
+        return data
 
 
 class PostSerializer(serializers.ModelSerializer):
