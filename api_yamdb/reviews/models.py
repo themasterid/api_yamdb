@@ -1,7 +1,26 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-User = get_user_model()
+
+class User(AbstractUser):
+    bio = models.TextField(
+        'Биография',
+        blank=True,
+    )
+    role = models.TextField(
+        'Роль',
+        blank=True,
+        default="user",
+    ) 
+
+
+class Auth(models.Model):
+    email = models.EmailField(max_length=254)
+    username = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+    )
 
 
 class Group(models.Model):
