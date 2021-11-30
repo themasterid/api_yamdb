@@ -4,9 +4,14 @@ from rest_framework.pagination import LimitOffsetPagination
 
 from .permissions import AuthorPermission
 from .serializers import (CommentSerializer, FollowSerializer, GroupSerializer,
-                          PostSerializer)
+                          PostSerializer, AuthSerializer)
 
-from posts.models import Group, Post
+from reviews.models import Group, Post, Auth
+
+class AuthViewSet((mixins.CreateModelMixin, viewsets.GenericViewSet)):
+    queryset = Auth.objects.all()
+    serializer_class = AuthSerializer
+    permission_classes = (permissions.AllowAny,) 
 
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
