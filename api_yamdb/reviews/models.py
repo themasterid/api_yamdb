@@ -1,10 +1,12 @@
 # ГОТОВО!
-from datetime import datetime
-
 from django.contrib.auth.models import AbstractUser
-from django.core.exceptions import ValidationError
+from django.contrib.auth.tokens import default_token_generator
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+from .validators import validate_username, validate_year
 
 ROLE_CHOICES = [
     ('user', 'user'),
@@ -13,57 +15,34 @@ ROLE_CHOICES = [
 ]
 
 
-def validate_username(value):
-    if value == 'me':
-        raise ValidationError(
-            ('Имя пользователя не может быть "me"'),
-            params={'value': value},
-        )
-
-
-def validate_year(value):
-    now = datetime.now().year
-    if value > now:
-        raise ValidationError(
-            f'{value} не может быть больше {now}'
-        )
-
-
 class User(AbstractUser):
     username = models.CharField(
-        'Логин пользователя',
+        'имя пользователя',
         validators=(validate_username,),
         max_length=50,
         unique=True
     )
     email = models.EmailField(
-        'Электронная почта',
+        'электронная почта',
         max_length=150,
         unique=True
     )
     bio = models.TextField(
-        'Биография',
+        'биография',
         blank=True,
     )
-    first_name = models.CharField(
-        'Имя',
-        max_length=150,
-        blank=True
-    )
-    last_name = models.CharField(
-        'Фамилия',
-        max_length=150,
-        blank=True
-    )
     role = models.CharField(
-        'Роль',
+        'роль',
         max_length=20,
         choices=ROLE_CHOICES,
         default='user',
         blank=True
     )
-    confirmation_code = models.IntegerField(
-        default=0
+    confirmation_code = models.CharField(
+        'код подтверждения',
+        max_length=255,
+        null=True,
+        blank=False
     )
 
     @property
@@ -87,15 +66,19 @@ class User(AbstractUser):
         return self.username
 
 
+@receiver(post_save, sender=User)
+def post_save(sender, instance, created, **kwargs):
+    if created:
+        confirmation_code = default_token_generator.make_token(
+            instance
+        )
+        instance.confirmation_code = confirmation_code
+        instance.save()
+
+
 class Category(models.Model):
-    name = models.CharField(
-        max_length=200,
-        verbose_name='Имя категории'
-    )
-    slug = models.SlugField(
-        unique=True,
-        verbose_name='Слаг категории'
-    )
+    name = models.CharField('имя категории', max_length=200)
+    slug = models.SlugField('слаг категории', unique=True)
 
     class Meta:
         ordering = ('-name',)
@@ -107,14 +90,8 @@ class Category(models.Model):
 
 
 class Genre(models.Model):
-    name = models.CharField(
-        max_length=200,
-        verbose_name='Имя жанра'
-    )
-    slug = models.SlugField(
-        unique=True,
-        verbose_name='Слаг жанра'
-    )
+    name = models.CharField('имя жанра', max_length=200)
+    slug = models.SlugField('cлаг жанра', unique=True)
 
     class Meta:
         ordering = ('-name',)
@@ -127,29 +104,29 @@ class Genre(models.Model):
 
 class Title(models.Model):
     name = models.CharField(
+        'название',
         max_length=200,
-        verbose_name='Название',
         db_index=True
     )
     year = models.IntegerField(
+        'год',
         validators=[validate_year],
         default=0,
-        verbose_name='Год',
         db_index=True
     )
     description = models.TextField(blank=True)
     category = models.ForeignKey(
         Category,
         related_name='titles',
-        on_delete=models.SET_NULL,
+        verbose_name='категория',
         null=True,
-        verbose_name='Категория'
+        on_delete=models.SET_NULL,
     )
     genre = models.ManyToManyField(
         Genre,
         related_name='titles',
-        blank=True,
-        verbose_name='Жанр'
+        verbose_name='жанр',
+        blank=True
     )
 
     class Meta:
@@ -177,11 +154,10 @@ class Review(models.Model):
     )
     score = models.IntegerField(
         'Оценка',
-        validators=[
+        validators=(
             MinValueValidator(1),
             MaxValueValidator(10)
-        ],
-        error_messages={'validators': 'Оценка от 1 до 10!'},
+        ),
         blank=False,
         null=False,
     )
