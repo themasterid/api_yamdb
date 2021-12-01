@@ -34,12 +34,18 @@ class SignUpSerializer(serializers.ModelSerializer):
 
 class CategorySerializer(serializers.ModelSerializer):
     """Михаил!"""
-    pass
+    class Meta:
+        model = Category
+        fields = '__all__'
+        lookup_field = 'slug'
 
 
 class GenreSerializer(serializers.ModelSerializer):
     """Михаил!"""
-    pass
+    class Meta:
+        model = Genre
+        fields = '__all__'
+        lookup_field = 'slug'
 
 
 class TitleReadSerializer(serializers.ModelSerializer):
