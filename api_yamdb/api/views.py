@@ -6,8 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from reviews.models import Category, Genre, Review, Title, User
 from .permissions import AdminOnly
-from .serializers import  NotAdminSerializer, UsersSerializer
-from .serializers import UserSerializer
+from .serializers import NotAdminSerializer, UsersSerializer
 from rest_framework import mixins, permissions, viewsets
 from reviews.models import User
 
