@@ -98,7 +98,7 @@ class CategoryViewSet(ModelMixinSet):
 
 
 class GenreViewSet(ModelMixinSet):
-    """Михаил"""
+    """Михаил взял и сделал, а ты дальше сиди в качалке!"""
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = [IsAdminUserOrReadOnly]
