@@ -10,10 +10,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from reviews.models import Review, Title, User
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .permissions import AdminModeratorAuthorPermission, AdminOnly
 from .serializers import (CommentsSerializer, NotAdminSerializer,
-                          ReviewSerializer, UsersSerializer)
+                          ReviewSerializer, UsersSerializer,
+                          GetTokenSerializer, SignUpSerializer)
 
 
 class ModelMixinSet(CreateModelMixin, ListModelMixin,
@@ -63,12 +65,23 @@ class UsersViewSet(viewsets.ModelViewSet):
 
 class APIGetToken(APIView):
     """Евгений"""
-    pass
+    queryset = User.objects.all()
+    serializer_class = GetTokenSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_tokens_for_user(user):
+        refresh = RefreshToken.for_user(user)
+
+        return {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        }
 
 
 class APISignup(APIView):
     """Евгений"""
-    # тут прорешать отправку сообщений на мыло,
+    queryset = User.objects.all()
+    serializer_class = SignUpSerializer
     # условие, если админ делает юзера, отправлять код не нужно.
     pass
 
