@@ -1,5 +1,3 @@
-import random
-import string
 from django.shortcuts import get_object_or_404
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
@@ -11,14 +9,15 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
-from reviews.models import Review, Title, User
 from rest_framework_simplejwt.tokens import RefreshToken
+from reviews.models import Category, Genre, Review, Title, User
 
-from .permissions import AdminModeratorAuthorPermission, AdminOnly
-from .serializers import (CommentsSerializer, NotAdminSerializer,
-                          ReviewSerializer, UsersSerializer,
-                          GetTokenSerializer, SignUpSerializer)
-from django.core.mail import send_mail
+from .permissions import (AdminModeratorAuthorPermission, AdminOnly,
+                          IsAdminUserOrReadOnly)
+from .serializers import (CategorySerializer, CommentsSerializer,
+                          GenreSerializer, GetTokenSerializer,
+                          NotAdminSerializer, ReviewSerializer,
+                          SignUpSerializer, UsersSerializer)
 
 
 class ModelMixinSet(CreateModelMixin, ListModelMixin,
@@ -85,31 +84,28 @@ class APISignup(APIView):
     """Евгений"""
     queryset = User.objects.all()
     serializer_class = SignUpSerializer
-
-    def generate_random_string():
-        letters = string.ascii_lowercase
-        rand_string = ''.join(random.choice(letters) for i in range(8))
-        return rand_string
-
-    send_mail(
-        'Код подтверждения',
-        generate_random_string(),
-        'zhenia2509@mail.ru',
-        ['to@example.com'],
-        fail_silently=False,
-    )
     # условие, если админ делает юзера, отправлять код не нужно.
     pass
 
 
 class CategoryViewSet(ModelMixinSet):
     """Михаил"""
-    pass
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAdminUserOrReadOnly]
+    filter_backends = (SearchFilter,)
+    search_fields = ['name', ]
+    lookup_field = 'slug'
 
 
 class GenreViewSet(ModelMixinSet):
     """Михаил"""
-    pass
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    permission_classes = [IsAdminUserOrReadOnly]
+    filter_backends = (SearchFilter,)
+    search_fields = ['name', ]
+    lookup_field = 'slug'
 
 
 class TitleViewSet(ModelViewSet):
