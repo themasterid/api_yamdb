@@ -1,74 +1,60 @@
+from django.core.exceptions import ValidationError
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
+from reviews.models import Category, Comments, Genre, Review, Title, User
 
-from reviews.models import Comment, Follow, Group, Post, User, Auth
 
-class AuthSerializer(serializers.ModelSerializer):
-
+class UsersSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Auth
-        fields = '__all__'
-        validators = []
-
-    def validate(self, data):
-        if data['username'] == 'me':
-            raise serializers.ValidationError(
-                'Такое имя запрещено')
-        return data
+        model = User
+        fields = (
+            'username', 'email', 'first_name',
+            'last_name', 'bio', 'role')
+        
 
 
-class PostSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(
-        slug_field='username',
-        read_only=True)
+class NotAdminSerializer(serializers.ModelSerializer):
+    """Евгений!"""
+    pass
 
+
+class GetTokenSerializer(serializers.ModelSerializer):
+    """Евгений!"""
+    pass
+
+
+class SignUpSerializer(serializers.ModelSerializer):
+    """Готово!"""
     class Meta:
-        model = Post
-        fields = '__all__'
+        model = User
+        fields = ('email', 'username')
 
 
-class CommentSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(
-        read_only=True,
-        slug_field='username',
-        default=serializers.CurrentUserDefault())
-    post = serializers.PrimaryKeyRelatedField(
-        read_only=True)
-
-    class Meta:
-        model = Comment
-        fields = '__all__'
+class CategorySerializer(serializers.ModelSerializer):
+    """Михаил!"""
+    pass
 
 
-class GroupSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Group
-        fields = '__all__'
+class GenreSerializer(serializers.ModelSerializer):
+    """Михаил!"""
+    pass
 
 
-class FollowSerializer(serializers.ModelSerializer):
-    user = serializers.SlugRelatedField(
-        slug_field='username',
-        queryset=User.objects.all(),
-        default=serializers.CurrentUserDefault())
-    following = serializers.SlugRelatedField(
-        slug_field='username',
-        queryset=User.objects.all())
+class TitleReadSerializer(serializers.ModelSerializer):
+    """Михаил!"""
+    pass
 
-    class Meta:
-        model = Follow
-        fields = '__all__'
-        validators = (
-            UniqueTogetherValidator(
-                queryset=Follow.objects.all(),
-                fields=('user', 'following'),
-                message=('Подписка на автора оформлена ранее!')
-            ),
-        )
 
-    def validate(self, data):
-        if data['user'] == data['following']:
-            raise serializers.ValidationError(
-                'Нельзя подписаться на самого себя!')
-        return data
+class TitleWriteSerializer(serializers.ModelSerializer):
+    """Михаил!"""
+    pass
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    """Дмитрий!"""
+    pass
+
+
+class CommentsSerializer(serializers.ModelSerializer):
+    """Дмитрий!"""
+    pass

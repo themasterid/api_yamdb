@@ -1,58 +1,96 @@
-from django.shortcuts import get_object_or_404
-from rest_framework import filters, mixins, permissions, viewsets
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework import mixins, permissions, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.filters import SearchFilter
+from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
+                                   ListModelMixin)
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.viewsets import GenericViewSet, ModelViewSet
+from reviews.models import Category, Genre, Review, Title, User
 
-from .permissions import AuthorPermission
-from .serializers import (CommentSerializer, FollowSerializer, GroupSerializer,
-                          PostSerializer, AuthSerializer)
-
-from reviews.models import Group, Post, Auth
-
-class AuthViewSet((mixins.CreateModelMixin, viewsets.GenericViewSet)):
-    queryset = Auth.objects.all()
-    serializer_class = AuthSerializer
-    permission_classes = (permissions.AllowAny,) 
-
-
-class GroupViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Group.objects.all()
-    serializer_class = GroupSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+from .permissions import AdminOnly
+from .serializers import NotAdminSerializer, UsersSerializer
 
 
-class FollowViewSet(mixins.CreateModelMixin,
-                    mixins.ListModelMixin,
-                    viewsets.GenericViewSet):
-    serializer_class = FollowSerializer
-    permission_classes = (permissions.IsAuthenticated,)
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('following__username',)
-
-    def get_queryset(self):
-        return self.request.user.follower.all()
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+class ModelMixinSet(CreateModelMixin, ListModelMixin,
+                    DestroyModelMixin, GenericViewSet):
+    """Готово!"""
+    pass
 
 
-class PostViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
-    permission_classes = (AuthorPermission,)
-    pagination_class = LimitOffsetPagination
-
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+class CreateViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    """Готово!"""
+    pass
 
 
-class CommentViewSet(viewsets.ModelViewSet):
-    serializer_class = CommentSerializer
-    permission_classes = (AuthorPermission,)
+class UsersViewSet(viewsets.ModelViewSet):
+    """Готово!"""
+    queryset = User.objects.all()
+    serializer_class = UsersSerializer
+    permission_classes = (IsAuthenticated, AdminOnly,)
+    lookup_field = 'username'
+    filter_backends = (SearchFilter, )
+    search_fields = ('username', )
+    pagination_class = PageNumberPagination
 
-    def perform_create(self, serializer):
-        post = get_object_or_404(Post, id=self.kwargs.get('post_id'))
-        serializer.save(author=self.request.user, post=post)
+    @action(
+        methods=['GET', 'PATCH'],
+        detail=False,
+        permission_classes=(IsAuthenticated, ),
+        url_path='me')
+    def get_current_user_info(self, request):
+        if request.method == 'PATCH':
+            if request.user.is_admin:
+                serializer = UsersSerializer(
+                    request.user,
+                    data=request.data,
+                    partial=True)
+            else:  # А нужен ли он тут?
+                serializer = NotAdminSerializer(
+                    request.user,
+                    data=request.data,
+                    partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = UsersSerializer(request.user)
+        return Response(serializer.data)
 
-    def get_queryset(self):
-        post = get_object_or_404(Post, id=self.kwargs.get('post_id'))
-        return post.comments.all()
+
+class APIGetToken(APIView):
+    """Евгений"""
+    pass
+
+
+class APISignup(APIView):
+    """Евгений"""
+    # тут прорешать отправку сообщений на мыло,
+    # условие, если админ делает юзера, отправлять код не нужно.
+    pass
+
+
+class CategoryViewSet(ModelMixinSet):
+    """Михаил"""
+    pass
+
+
+class GenreViewSet(ModelMixinSet):
+    """Михаил"""
+    pass
+
+
+class TitleViewSet(ModelViewSet):
+    """Михаил"""
+    pass
+
+
+class CommentsViewSet(viewsets.ModelViewSet):
+    """Дмитрий"""
+    pass
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    """Дмитрий"""
+    pass
