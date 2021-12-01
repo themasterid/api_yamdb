@@ -1,3 +1,5 @@
+import random
+import string
 from django.shortcuts import get_object_or_404
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
@@ -16,6 +18,7 @@ from .permissions import AdminModeratorAuthorPermission, AdminOnly
 from .serializers import (CommentsSerializer, NotAdminSerializer,
                           ReviewSerializer, UsersSerializer,
                           GetTokenSerializer, SignUpSerializer)
+from django.core.mail import send_mail
 
 
 class ModelMixinSet(CreateModelMixin, ListModelMixin,
@@ -82,6 +85,19 @@ class APISignup(APIView):
     """Евгений"""
     queryset = User.objects.all()
     serializer_class = SignUpSerializer
+
+    def generate_random_string():
+        letters = string.ascii_lowercase
+        rand_string = ''.join(random.choice(letters) for i in range(8))
+        return rand_string
+
+    send_mail(
+        'Код подтверждения',
+        generate_random_string(),
+        'zhenia2509@mail.ru',
+        ['to@example.com'],
+        fail_silently=False,
+    )
     # условие, если админ делает юзера, отправлять код не нужно.
     pass
 
