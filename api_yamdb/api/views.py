@@ -15,7 +15,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .permissions import AdminModeratorAuthorPermission, AdminOnly
 from .serializers import (CommentsSerializer, NotAdminSerializer,
                           ReviewSerializer, UsersSerializer,
-                          GetTokenSerializer)
+                          GetTokenSerializer, SignUpSerializer)
 
 
 class ModelMixinSet(CreateModelMixin, ListModelMixin,
@@ -80,7 +80,8 @@ class APIGetToken(APIView):
 
 class APISignup(APIView):
     """Евгений"""
-    # тут прорешать отправку сообщений на мыло,
+    queryset = User.objects.all()
+    serializer_class = SignUpSerializer
     # условие, если админ делает юзера, отправлять код не нужно.
     pass
 
