@@ -10,14 +10,15 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
+from reviews.models import Category, Genre, Review, Title, User
 
-from reviews.models import Review, Title, User, Category, Genre
 from .permissions import (AdminModeratorAuthorPermission, AdminOnly,
                           IsAdminUserOrReadOnly)
-from .serializers import (CommentsSerializer, NotAdminSerializer,
-                          ReviewSerializer, UsersSerializer,
-                          GetTokenSerializer, SignUpSerializer,
-                          CategorySerializer, GenreSerializer)
+from .serializers import (CategorySerializer, CommentsSerializer,
+                          GenreSerializer, GetTokenSerializer,
+                          NotAdminSerializer, ReviewSerializer,
+                          SignUpSerializer, UsersSerializer)
+
 
 class ModelMixinSet(CreateModelMixin, ListModelMixin,
                     DestroyModelMixin, GenericViewSet):
@@ -98,7 +99,7 @@ class CategoryViewSet(ModelMixinSet):
 
 
 class GenreViewSet(ModelMixinSet):
-    """Михаил взял и сделал, а ты дальше сиди в качалке!"""
+    """Михаил"""
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = [IsAdminUserOrReadOnly]
