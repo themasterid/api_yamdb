@@ -10,7 +10,6 @@ class UsersSerializer(serializers.ModelSerializer):
         fields = (
             'username', 'email', 'first_name',
             'last_name', 'bio', 'role')
-        
 
 
 class NotAdminSerializer(serializers.ModelSerializer):
@@ -20,7 +19,10 @@ class NotAdminSerializer(serializers.ModelSerializer):
 
 class GetTokenSerializer(serializers.ModelSerializer):
     """Евгений!"""
-    pass
+    class Meta:
+        model = User
+        fields = (
+            'username', 'confirmation_code')
 
 
 class SignUpSerializer(serializers.ModelSerializer):
