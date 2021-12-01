@@ -9,11 +9,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
-from reviews.models import Review, Title, User
+from reviews.models import Review, Title, User, Category, Genre
 
-from .permissions import AdminModeratorAuthorPermission, AdminOnly
+from .permissions import (AdminModeratorAuthorPermission, AdminOnly,
+                          IsAdminUserOrReadOnly)
 from .serializers import (CommentsSerializer, NotAdminSerializer,
-                          ReviewSerializer, UsersSerializer)
+                          ReviewSerializer, UsersSerializer,
+                          CategorySerializer, GenreSerializer)
 
 
 class ModelMixinSet(CreateModelMixin, ListModelMixin,
@@ -75,12 +77,22 @@ class APISignup(APIView):
 
 class CategoryViewSet(ModelMixinSet):
     """Михаил"""
-    pass
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAdminUserOrReadOnly]
+    filter_backends = (SearchFilter,)
+    search_fields = ['name', ]
+    lookup_field = 'slug'
 
 
 class GenreViewSet(ModelMixinSet):
     """Михаил"""
-    pass
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    permission_classes = [IsAdminUserOrReadOnly]
+    filter_backends = (SearchFilter,)
+    search_fields = ['name', ]
+    lookup_field = 'slug'
 
 
 class TitleViewSet(ModelViewSet):
