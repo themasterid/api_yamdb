@@ -1,15 +1,60 @@
+from django.core.exceptions import ValidationError
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from reviews.models import User
+from reviews.models import Category, Comments, Genre, Review, Title, User
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UsersSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = '__all__'
-        validators = []
+        fields = (
+            'username', 'email', 'first_name',
+            'last_name', 'bio', 'role')
+        
 
-    def validate(self, data):
-        if data['username'] == 'me':
-            raise serializers.ValidationError(
-                'Такое имя запрещено')
-        return data
+
+class NotAdminSerializer(serializers.ModelSerializer):
+    """Евгений!"""
+    pass
+
+
+class GetTokenSerializer(serializers.ModelSerializer):
+    """Евгений!"""
+    pass
+
+
+class SignUpSerializer(serializers.ModelSerializer):
+    """Готово!"""
+    class Meta:
+        model = User
+        fields = ('email', 'username')
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    """Михаил!"""
+    pass
+
+
+class GenreSerializer(serializers.ModelSerializer):
+    """Михаил!"""
+    pass
+
+
+class TitleReadSerializer(serializers.ModelSerializer):
+    """Михаил!"""
+    pass
+
+
+class TitleWriteSerializer(serializers.ModelSerializer):
+    """Михаил!"""
+    pass
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    """Дмитрий!"""
+    pass
+
+
+class CommentsSerializer(serializers.ModelSerializer):
+    """Дмитрий!"""
+    pass
