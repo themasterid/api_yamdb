@@ -65,27 +65,33 @@ class UsersViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class APIGetToken(APIView):
-    """Евгений"""
-    queryset = User.objects.all()
-    serializer_class = GetTokenSerializer
-    permission_classes = (IsAuthenticated,)
-
-    def get_tokens_for_user(user):
-        refresh = RefreshToken.for_user(user)
-
-        return {
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
-        }
-
-
 class APISignup(APIView):
     """Евгений"""
     queryset = User.objects.all()
     serializer_class = SignUpSerializer
     # условие, если админ делает юзера, отправлять код не нужно.
     pass
+
+
+class APIGetToken(APIView):
+    """Евгений"""
+    def post(self, request):
+        serializer = GetTokenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        try:
+            user = User.objects.get(username=data['username'])
+        except User.DoesNotExist:
+            return Response(
+                {'username': 'Пользователь не найден!'},
+                status=status.HTTP_404_NOT_FOUND)
+        if data.get('confirmation_code') == user.confirmation_code:
+            token = RefreshToken.for_user(user).access_token
+            return Response({'token': str(token)},
+                            status=status.HTTP_201_CREATED)
+        return Response(
+            {'confirmation_code': 'Неверный код подтверждения!'},
+            status=status.HTTP_400_BAD_REQUEST)
 
 
 class CategoryViewSet(ModelMixinSet):
