@@ -1,5 +1,8 @@
+from django.core.mail import EmailMessage
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
-from rest_framework import mixins, status, viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
 from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
@@ -12,27 +15,27 @@ from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 from reviews.models import Category, Genre, Review, Title, User
 
+from api.filters import TitleFilter
+
 from .permissions import (AdminModeratorAuthorPermission, AdminOnly,
                           IsAdminUserOrReadOnly)
 from .serializers import (CategorySerializer, CommentsSerializer,
                           GenreSerializer, GetTokenSerializer,
                           NotAdminSerializer, ReviewSerializer,
-                          SignUpSerializer, UsersSerializer)
+                          SignUpSerializer, TitleReadSerializer,
+                          TitleWriteSerializer, UsersSerializer)
 
 
 class ModelMixinSet(CreateModelMixin, ListModelMixin,
                     DestroyModelMixin, GenericViewSet):
-    """Готово!"""
     pass
 
 
 class CreateViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
-    """Готово!"""
     pass
 
 
 class UsersViewSet(viewsets.ModelViewSet):
-    """Готово!"""
     queryset = User.objects.all()
     serializer_class = UsersSerializer
     permission_classes = (IsAuthenticated, AdminOnly,)
@@ -53,7 +56,7 @@ class UsersViewSet(viewsets.ModelViewSet):
                     request.user,
                     data=request.data,
                     partial=True)
-            else:  # А нужен ли он тут?
+            else:
                 serializer = NotAdminSerializer(
                     request.user,
                     data=request.data,
@@ -66,51 +69,85 @@ class UsersViewSet(viewsets.ModelViewSet):
 
 
 class APIGetToken(APIView):
-    """Евгений"""
-    queryset = User.objects.all()
-    serializer_class = GetTokenSerializer
-    permission_classes = (IsAuthenticated,)
-
-    def get_tokens_for_user(user):
-        refresh = RefreshToken.for_user(user)
-
-        return {
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
-        }
+    def post(self, request):
+        serializer = GetTokenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        try:
+            user = User.objects.get(username=data['username'])
+        except User.DoesNotExist:
+            return Response(
+                {'username': 'Пользователь не найден!'},
+                status=status.HTTP_404_NOT_FOUND)
+        if data.get('confirmation_code') == user.confirmation_code:
+            token = RefreshToken.for_user(user).access_token
+            return Response({'token': str(token)},
+                            status=status.HTTP_201_CREATED)
+        return Response(
+            {'confirmation_code': 'Неверный код подтверждения!'},
+            status=status.HTTP_400_BAD_REQUEST)
 
 
 class APISignup(APIView):
-    """Евгений"""
-    queryset = User.objects.all()
-    serializer_class = SignUpSerializer
-    # условие, если админ делает юзера, отправлять код не нужно.
-    pass
+    permission_classes = (permissions.AllowAny,)
+
+    @staticmethod
+    def send_email(data):
+        email = EmailMessage(
+            subject=data['email_subject'],
+            body=data['email_body'],
+            to=[data['to_email']]
+        )
+        email.send()
+
+    def post(self, request):
+        serializer = SignUpSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+
+        email_body = (
+            f'Доброе время суток, {user.username}.'
+            f'\nКод подтвержения для доступа к API: {user.confirmation_code}'
+        )
+        data = {
+            'email_body': email_body,
+            'to_email': user.email,
+            'email_subject': 'Код подтвержения для доступа к API!'
+        }
+        self.send_email(data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class CategoryViewSet(ModelMixinSet):
-    """Михаил"""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [IsAdminUserOrReadOnly]
-    filter_backends = (SearchFilter,)
-    search_fields = ['name', ]
+    permission_classes = (IsAdminUserOrReadOnly,)
+    filter_backends = (SearchFilter, )
+    search_fields = ('name', )
     lookup_field = 'slug'
 
 
 class GenreViewSet(ModelMixinSet):
-    """Михаил"""
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = [IsAdminUserOrReadOnly]
+    permission_classes = (IsAdminUserOrReadOnly,)
     filter_backends = (SearchFilter,)
-    search_fields = ['name', ]
+    search_fields = ('name', )
     lookup_field = 'slug'
 
 
 class TitleViewSet(ModelViewSet):
-    """Михаил"""
-    pass
+    queryset = Title.objects.annotate(
+        rating=Avg('reviews__score')
+    ).all()
+    permission_classes = (IsAdminUserOrReadOnly,)
+    filter_backends = (DjangoFilterBackend, )
+    filterset_class = TitleFilter
+
+    def get_serializer_class(self):
+        if self.action in ('list', 'retrieve'):
+            return TitleReadSerializer
+        return TitleWriteSerializer
 
 
 class CommentsViewSet(viewsets.ModelViewSet):
