@@ -43,23 +43,17 @@ class SignUpSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
-        exclude = ['id']
+        exclude = ('id', )
         model = Category
         lookup_field = 'slug'
-        extra_kwargs = {
-            'url': {'lookup_field': 'slug'}
-        }
 
 
 class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
-        exclude = ['id']
+        exclude = ('id', )
         model = Genre
         lookup_field = 'slug'
-        extra_kwargs = {
-            'url': {'lookup_field': 'slug'}
-        }
 
 
 class TitleReadSerializer(serializers.ModelSerializer):
