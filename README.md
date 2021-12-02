@@ -115,11 +115,12 @@ DELETE /api/v1/categories/{slug}/
 ```
 Права доступа: Администратор.
 POST /api/v1/genres/
-```
+
 {
   "name": "string",
   "slug": "string"
 }
+```
 
 Удаление жанра:
 ```
@@ -130,20 +131,20 @@ DELETE /api/v1/genres/{slug}/
 Обновление публикации:
 ```
 PUT /api/v1/posts/{id}/
-```
-в body
+
 {
 "text": "string",
 "image": "string",
 "group": 0
 }
+```
 
 Добавление произведения:
 ```
 Права доступа: Администратор. 
 Нельзя добавлять произведения, которые еще не вышли (год выпуска не может быть больше текущего).
 POST /api/v1/titles/
-```
+
 {
   "name": "string",
   "year": 0,
@@ -153,12 +154,13 @@ POST /api/v1/titles/
   ],
   "category": "string"
 }
+```
 
 Добавление произведения:
 ```
 Права доступа: Доступно без токена
 GET /api/v1/titles/{titles_id}/
-```
+
 {
   "id": 0,
   "name": "string",
@@ -176,12 +178,13 @@ GET /api/v1/titles/{titles_id}/
     "slug": "string"
   }
 }
+```
 
 Частичное обновление информации о произведении:
 ```
 Права доступа: Администратор
 PATCH /api/v1/titles/{titles_id}/
-```
+
 {
   "name": "string",
   "year": 0,
@@ -191,6 +194,7 @@ PATCH /api/v1/titles/{titles_id}/
   ],
   "category": "string"
 }
+```
 
 Частичное обновление информации о произведении:
 ```
