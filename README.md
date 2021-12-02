@@ -95,16 +95,37 @@ POST /api/v1/auth/token/
 ТУТ
 
 ### Примеры работы с API для авторизованных пользователей
-Для создания публикации используем:
+Добавление категории:
 ```
-POST /api/v1/posts/
+Права доступа: Администратор.
+POST /api/v1/categories/
 ```
-в body
 {
-"text": "string",
-"image": "string",
-"group": 0
+  "name": "string",
+  "slug": "string"
 }
+
+Удаление категории:
+```
+Права доступа: Администратор.
+DELETE /api/v1/categories/{slug}/
+```
+
+Добавление жанра:
+```
+Права доступа: Администратор.
+POST /api/v1/genres/
+```
+{
+  "name": "string",
+  "slug": "string"
+}
+
+Удаление жанра:
+```
+Права доступа: Администратор.
+DELETE /api/v1/genres/{slug}/
+```
 
 Обновление публикации:
 ```
@@ -117,21 +138,68 @@ PUT /api/v1/posts/{id}/
 "group": 0
 }
 
-Частичное обновление публикации:
+Добавление произведения:
 ```
-PATCH /api/v1/posts/{id}/
+Права доступа: Администратор. 
+Нельзя добавлять произведения, которые еще не вышли (год выпуска не может быть больше текущего).
+POST /api/v1/titles/
 ```
-в body
 {
-"text": "string",
-"image": "string",
-"group": 0
+  "name": "string",
+  "year": 0,
+  "description": "string",
+  "genre": [
+    "string"
+  ],
+  "category": "string"
 }
 
-Частичное обновление публикации:
+Добавление произведения:
 ```
-DEL /api/v1/posts/{id}/
+Права доступа: Доступно без токена
+GET /api/v1/titles/{titles_id}/
 ```
+{
+  "id": 0,
+  "name": "string",
+  "year": 0,
+  "rating": 0,
+  "description": "string",
+  "genre": [
+    {
+      "name": "string",
+      "slug": "string"
+    }
+  ],
+  "category": {
+    "name": "string",
+    "slug": "string"
+  }
+}
+
+Частичное обновление информации о произведении:
+```
+Права доступа: Администратор
+PATCH /api/v1/titles/{titles_id}/
+```
+{
+  "name": "string",
+  "year": 0,
+  "description": "string",
+  "genre": [
+    "string"
+  ],
+  "category": "string"
+}
+
+Частичное обновление информации о произведении:
+```
+Права доступа: Администратор
+DEL /api/v1/titles/{titles_id}/
+```
+
+ТУТ
+
 Получение доступа к эндпоинту /api/v1/follow/
 (подписки) доступен только для авторизованных пользователей.
 ```
