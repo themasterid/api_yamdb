@@ -30,6 +30,12 @@ class User(AbstractUser):
         blank=False,
         null=False
     )
+    role = models.CharField(
+        'роль',
+        max_length=20,
+        choices=ROLE_CHOICES,
+        default='user'
+    )
     bio = models.TextField(
         'биография',
         blank=True,
@@ -43,12 +49,6 @@ class User(AbstractUser):
         'фамилия',
         max_length=150,
         blank=True
-    )
-    role = models.CharField(
-        'роль',
-        max_length=20,
-        choices=ROLE_CHOICES,
-        default='user'
     )
     confirmation_code = models.CharField(
         'код подтверждения',
@@ -114,12 +114,12 @@ class Genre(models.Model):
 
 
 class GenreTitle(models.Model):
-    genre = models.ForeignKey(
-        'Genre',
-        on_delete=models.CASCADE
-    )
     title = models.ForeignKey(
         'Title',
+        on_delete=models.CASCADE
+    )
+    genre = models.ForeignKey(
+        'Genre',
         on_delete=models.CASCADE
     )
 
@@ -136,17 +136,17 @@ class Title(models.Model):
         'год',
         validators=[validate_year]
     )
-    description = models.TextField(
-        'описание',
-        max_length=255,
-        null=True,
-        blank=True
-    )
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
         related_name='category',
         verbose_name='категория',
+        null=True,
+        blank=True
+    )
+    description = models.TextField(
+        'описание',
+        max_length=255,
         null=True,
         blank=True
     )
