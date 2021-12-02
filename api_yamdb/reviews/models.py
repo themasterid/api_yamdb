@@ -1,4 +1,3 @@
-# ГОТОВО!
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.tokens import default_token_generator
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -19,30 +18,44 @@ class User(AbstractUser):
     username = models.CharField(
         'имя пользователя',
         validators=(validate_username,),
-        max_length=50,
-        unique=True
+        max_length=150,
+        unique=True,
+        blank=False,
+        null=False
     )
     email = models.EmailField(
         'электронная почта',
-        max_length=150,
-        unique=True
+        max_length=254,
+        unique=True,
+        blank=False,
+        null=False
     )
     bio = models.TextField(
         'биография',
         blank=True,
     )
+    first_name = models.CharField(
+        'имя',
+        max_length=150,
+        blank=True
+    )
+    last_name = models.CharField(
+        'фамилия',
+        max_length=150,
+        blank=True
+    )
     role = models.CharField(
         'роль',
         max_length=20,
         choices=ROLE_CHOICES,
-        default='user',
-        blank=True
+        default='user'
     )
     confirmation_code = models.CharField(
         'код подтверждения',
         max_length=255,
         null=True,
-        blank=False
+        blank=False,
+        default='0'
     )
 
     @property
@@ -58,7 +71,7 @@ class User(AbstractUser):
         return self.role == 'moderator'
 
     class Meta:
-        ordering = ('-username', )
+        ordering = ('id',)
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
 
@@ -81,12 +94,11 @@ class Category(models.Model):
     slug = models.SlugField('слаг категории', unique=True)
 
     class Meta:
-        ordering = ('-name',)
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
     def __str__(self):
-        return self.name
+        return f'{self.name} {self.name}'
 
 
 class Genre(models.Model):
@@ -94,45 +106,60 @@ class Genre(models.Model):
     slug = models.SlugField('cлаг жанра', unique=True)
 
     class Meta:
-        ordering = ('-name',)
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
 
     def __str__(self):
-        return self.name
+        return f'{self.name} {self.name}'
+
+
+class GenreTitle(models.Model):
+    genre = models.ForeignKey(
+        'Genre',
+        on_delete=models.CASCADE
+    )
+    title = models.ForeignKey(
+        'Title',
+        on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return f'{self.title} {self.genre}'
 
 
 class Title(models.Model):
     name = models.CharField(
         'название',
-        max_length=200,
-        db_index=True
+        max_length=200
     )
     year = models.IntegerField(
         'год',
-        validators=[validate_year],
-        default=0,
-        db_index=True
+        validators=[validate_year]
     )
-    description = models.TextField(blank=True)
+    description = models.TextField(
+        'описание',
+        max_length=255,
+        null=True,
+        blank=True
+    )
     category = models.ForeignKey(
         Category,
-        related_name='titles',
+        on_delete=models.SET_NULL,
+        related_name='category',
         verbose_name='категория',
         null=True,
-        on_delete=models.SET_NULL,
+        blank=True
     )
     genre = models.ManyToManyField(
         Genre,
-        related_name='titles',
-        verbose_name='жанр',
-        blank=True
+        through='GenreTitle',
+        related_name='genre',
+        verbose_name='жанр'
     )
 
     class Meta:
-        ordering = ('-name',)
-        verbose_name = 'Заголовок'
-        verbose_name_plural = 'Заголовки'
+        verbose_name = 'Произведение'
+        verbose_name_plural = 'Произведения'
 
     def __str__(self):
         return self.name
@@ -142,7 +169,8 @@ class Review(models.Model):
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
-        related_name='reviews'
+        related_name='reviews',
+        verbose_name='произведение'
     )
     text = models.CharField(
         max_length=200
@@ -150,32 +178,29 @@ class Review(models.Model):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='reviews'
+        related_name='reviews',
+        verbose_name='автор'
     )
     score = models.IntegerField(
-        'Оценка',
+        'оценка',
         validators=(
             MinValueValidator(1),
             MaxValueValidator(10)
         ),
-        blank=False,
-        null=False,
     )
     pub_date = models.DateTimeField(
-        verbose_name='Дата публикации',
+        'дата публикации',
         auto_now_add=True
     )
 
     class Meta:
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
-        db_table = 'reviews'
         constraints = [
             models.UniqueConstraint(
                 fields=['title', 'author'],
-                name='unique_author_for_title'
+                name='unique review'
             )]
-        ordering = ('-score', 'pub_date',)
 
     def __str__(self):
         return self.text
@@ -184,27 +209,26 @@ class Review(models.Model):
 class Comments(models.Model):
     review = models.ForeignKey(
         Review,
-        verbose_name='Отзыв',
         on_delete=models.CASCADE,
-        related_name='comments'
+        related_name='comments',
+        verbose_name='отзыв'
     )
     text = models.CharField(
-        'Текст комментария',
+        'текст комментария',
         max_length=200
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='comments'
+        related_name='comments',
+        verbose_name='автор'
     )
     pub_date = models.DateTimeField(
-        verbose_name='Дата публикации',
-        auto_now_add=True,
-        db_index=True
+        'дата публикации',
+        auto_now_add=True
     )
 
     class Meta:
-        ordering = ('id',)
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
 
