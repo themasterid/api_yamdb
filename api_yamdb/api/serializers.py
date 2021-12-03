@@ -22,8 +22,6 @@ class NotAdminSerializer(serializers.ModelSerializer):
 
 
 class GetTokenSerializer(serializers.ModelSerializer):
-    username = serializers.CharField()
-    confirmation_code = serializers.CharField()
 
     class Meta:
         model = User
