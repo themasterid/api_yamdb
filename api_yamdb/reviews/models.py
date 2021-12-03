@@ -7,10 +7,20 @@ from django.dispatch import receiver
 
 from .validators import validate_username, validate_year
 
+USER = 'user'
+ADMIN = 'admin'
+MODERATOR = 'moderator'
+
+ROLE = {
+    'USER': USER,
+    'ADMIN': ADMIN,
+    'MODERATOR': MODERATOR,
+}
+
 ROLE_CHOICES = [
-    ('user', 'user'),
-    ('moderator', 'moderator'),
-    ('admin', 'admin')
+    (USER, USER),
+    (ADMIN, ADMIN),
+    (MODERATOR, MODERATOR),
 ]
 
 
@@ -34,7 +44,8 @@ class User(AbstractUser):
         'роль',
         max_length=20,
         choices=ROLE_CHOICES,
-        default='user'
+        default=USER,
+        blank=True
     )
     bio = models.TextField(
         'биография',
@@ -55,20 +66,20 @@ class User(AbstractUser):
         max_length=255,
         null=True,
         blank=False,
-        default='0'
+        default='XXXX'
     )
 
     @property
     def is_user(self):
-        return self.role == 'user'
+        return self.role == ROLE['USER']
 
     @property
     def is_admin(self):
-        return self.role == 'admin'
+        return self.role == ROLE['ADMIN']
 
     @property
     def is_moderator(self):
-        return self.role == 'moderator'
+        return self.role == ROLE['MODERATOR']
 
     class Meta:
         ordering = ('id',)
@@ -90,8 +101,15 @@ def post_save(sender, instance, created, **kwargs):
 
 
 class Category(models.Model):
-    name = models.CharField('имя категории', max_length=200)
-    slug = models.SlugField('слаг категории', unique=True, db_index=True)
+    name = models.CharField(
+        'имя категории',
+        max_length=200
+    )
+    slug = models.SlugField(
+        'слаг категории',
+        unique=True,
+        db_index=True
+    )
 
     class Meta:
         verbose_name = 'Категория'
@@ -102,8 +120,15 @@ class Category(models.Model):
 
 
 class Genre(models.Model):
-    name = models.CharField('имя жанра', max_length=200)
-    slug = models.SlugField('cлаг жанра', unique=True, db_index=True)
+    name = models.CharField(
+        'имя жанра',
+        max_length=200
+    )
+    slug = models.SlugField(
+        'cлаг жанра',
+        unique=True,
+        db_index=True
+    )
 
     class Meta:
         verbose_name = 'Жанр'
@@ -111,20 +136,6 @@ class Genre(models.Model):
 
     def __str__(self):
         return f'{self.name} {self.name}'
-
-
-class GenreTitle(models.Model):
-    title = models.ForeignKey(
-        'Title',
-        on_delete=models.CASCADE
-    )
-    genre = models.ForeignKey(
-        'Genre',
-        on_delete=models.CASCADE
-    )
-
-    def __str__(self):
-        return f'{self.title} {self.genre}'
 
 
 class Title(models.Model):
@@ -135,12 +146,12 @@ class Title(models.Model):
     )
     year = models.IntegerField(
         'год',
-        validators=[validate_year]
+        validators=(validate_year, )
     )
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
-        related_name='category',
+        related_name='titles',
         verbose_name='категория',
         null=True,
         blank=True
@@ -153,8 +164,7 @@ class Title(models.Model):
     )
     genre = models.ManyToManyField(
         Genre,
-        through='GenreTitle',
-        related_name='genre',
+        related_name='titles',
         verbose_name='жанр'
     )
 
@@ -188,6 +198,7 @@ class Review(models.Model):
             MinValueValidator(1),
             MaxValueValidator(10)
         ),
+        error_messages={'validators': 'Оценка от 1 до 10!'}
     )
     pub_date = models.DateTimeField(
         'дата публикации',
@@ -200,15 +211,16 @@ class Review(models.Model):
         verbose_name_plural = 'Отзывы'
         constraints = [
             models.UniqueConstraint(
-                fields=['title', 'author'],
+                fields=('title', 'author', ),
                 name='unique review'
             )]
+        ordering = ('pub_date',)
 
     def __str__(self):
         return self.text
 
 
-class Comments(models.Model):
+class Comment(models.Model):
     review = models.ForeignKey(
         Review,
         on_delete=models.CASCADE,
