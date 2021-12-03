@@ -13,49 +13,76 @@ class UsersSerializer(serializers.ModelSerializer):
 
 
 class NotAdminSerializer(serializers.ModelSerializer):
-    """Евгений!"""
-    pass
-
-
-class GetTokenSerializer(serializers.ModelSerializer):
-    """Евгений!"""
     class Meta:
         model = User
         fields = (
-            'username', 'confirmation_code')
+            'username', 'email', 'first_name',
+            'last_name', 'bio', 'role')
+        read_only_fields = ('role',)
+
+
+class GetTokenSerializer(serializers.ModelSerializer):
+    username = serializers.CharField()
+    confirmation_code = serializers.CharField()
+
+    class Meta:
+        model = User
+        fields = (
+            'username',
+            'confirmation_code'
+        )
 
 
 class SignUpSerializer(serializers.ModelSerializer):
-    """Готово!"""
+
     class Meta:
         model = User
         fields = ('email', 'username')
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    """Михаил!"""
+
     class Meta:
+        exclude = ('id', )
         model = Category
-        fields = '__all__'
         lookup_field = 'slug'
 
 
 class GenreSerializer(serializers.ModelSerializer):
-    """Михаил!"""
+
     class Meta:
+        exclude = ('id', )
         model = Genre
-        fields = '__all__'
         lookup_field = 'slug'
 
 
 class TitleReadSerializer(serializers.ModelSerializer):
-    """Михаил!"""
-    pass
+    category = CategorySerializer(read_only=True)
+    genre = GenreSerializer(
+        read_only=True,
+        many=True
+    )
+    rating = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        fields = '__all__'
+        model = Title
 
 
 class TitleWriteSerializer(serializers.ModelSerializer):
-    """Михаил!"""
-    pass
+    category = serializers.SlugRelatedField(
+        queryset=Category.objects.all(),
+        slug_field='slug'
+    )
+    genre = serializers.SlugRelatedField(
+        queryset=Genre.objects.all(),
+        slug_field='slug',
+        many=True
+    )
+
+    class Meta:
+        fields = '__all__'
+        model = Title
 
 
 class ReviewSerializer(serializers.ModelSerializer):
