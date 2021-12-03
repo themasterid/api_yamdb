@@ -2,7 +2,6 @@ from django.core.mail import EmailMessage
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 
-from api.filters import TitleFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
@@ -14,10 +13,11 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 from reviews.models import Category, Genre, Review, Title, User
 
+from api.filters import TitleFilter
 from .mixins import ModelMixinSet
 from .permissions import (AdminModeratorAuthorPermission, AdminOnly,
                           IsAdminUserOrReadOnly)
-from .serializers import (CategorySerializer, CommentsSerializer,
+from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, GetTokenSerializer,
                           NotAdminSerializer, ReviewSerializer,
                           SignUpSerializer, TitleReadSerializer,
@@ -158,8 +158,8 @@ class TitleViewSet(ModelViewSet):
         return TitleWriteSerializer
 
 
-class CommentsViewSet(viewsets.ModelViewSet):
-    serializer_class = CommentsSerializer
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
     permission_classes = (AdminModeratorAuthorPermission,)
 
     def get_queryset(self):

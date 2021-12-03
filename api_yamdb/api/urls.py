@@ -1,7 +1,8 @@
 from django.urls import include, path
+
 from rest_framework.routers import SimpleRouter
 
-from .views import (APIGetToken, APISignup, CategoryViewSet, CommentsViewSet,
+from .views import (APIGetToken, APISignup, CategoryViewSet, CommentViewSet,
                     GenreViewSet, ReviewViewSet, TitleViewSet, UsersViewSet)
 
 app_name = 'api'
@@ -14,7 +15,7 @@ router.register(
 )
 router.register(
     r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
-    CommentsViewSet,
+    CommentViewSet,
     basename='comments'
 )
 router.register(
