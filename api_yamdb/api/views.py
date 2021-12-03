@@ -107,7 +107,6 @@ class APISignup(APIView):
 
 
 class APIGetToken(APIView):
-    """Евгений"""
     def post(self, request):
         serializer = GetTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
