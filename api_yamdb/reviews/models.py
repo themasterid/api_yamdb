@@ -91,7 +91,7 @@ def post_save(sender, instance, created, **kwargs):
 
 class Category(models.Model):
     name = models.CharField('имя категории', max_length=200)
-    slug = models.SlugField('слаг категории', unique=True)
+    slug = models.SlugField('слаг категории', unique=True, db_index=True)
 
     class Meta:
         verbose_name = 'Категория'
@@ -103,7 +103,7 @@ class Category(models.Model):
 
 class Genre(models.Model):
     name = models.CharField('имя жанра', max_length=200)
-    slug = models.SlugField('cлаг жанра', unique=True)
+    slug = models.SlugField('cлаг жанра', unique=True, db_index=True)
 
     class Meta:
         verbose_name = 'Жанр'
@@ -130,7 +130,8 @@ class GenreTitle(models.Model):
 class Title(models.Model):
     name = models.CharField(
         'название',
-        max_length=200
+        max_length=200,
+        db_index=True
     )
     year = models.IntegerField(
         'год',
@@ -190,7 +191,8 @@ class Review(models.Model):
     )
     pub_date = models.DateTimeField(
         'дата публикации',
-        auto_now_add=True
+        auto_now_add=True,
+        db_index=True
     )
 
     class Meta:
@@ -225,7 +227,8 @@ class Comments(models.Model):
     )
     pub_date = models.DateTimeField(
         'дата публикации',
-        auto_now_add=True
+        auto_now_add=True,
+        db_index=True
     )
 
     class Meta:
