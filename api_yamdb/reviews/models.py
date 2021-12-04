@@ -11,12 +11,6 @@ USER = 'user'
 ADMIN = 'admin'
 MODERATOR = 'moderator'
 
-ROLE = {
-    'USER': USER,
-    'ADMIN': ADMIN,
-    'MODERATOR': MODERATOR,
-}
-
 ROLE_CHOICES = [
     (USER, USER),
     (ADMIN, ADMIN),
@@ -71,15 +65,15 @@ class User(AbstractUser):
 
     @property
     def is_user(self):
-        return self.role == ROLE['USER']
+        return self.role == USER
 
     @property
     def is_admin(self):
-        return self.role == ROLE['ADMIN']
+        return self.role == ADMIN
 
     @property
     def is_moderator(self):
-        return self.role == ROLE['MODERATOR']
+        return self.role == MODERATOR
 
     class Meta:
         ordering = ('id',)
