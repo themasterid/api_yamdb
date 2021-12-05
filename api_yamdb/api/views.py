@@ -56,6 +56,15 @@ class UsersViewSet(viewsets.ModelViewSet):
 
 
 class APIGetToken(APIView):
+    """
+    Получение JWT-токена в обмен на username и confirmation code.
+    Права доступа: Доступно без токена.
+    Пример тела body:
+    {
+        "username": "string",
+        "confirmation_code": "string"
+    }
+    """
     def post(self, request):
         serializer = GetTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -76,6 +85,17 @@ class APIGetToken(APIView):
 
 
 class APISignup(APIView):
+    """
+    Получить код подтверждения на переданный email.
+    Права доступа: Доступно без токена.
+    Использовать имя 'me' в качестве username запрещено.
+    Поля email и username должны быть уникальными.
+    Пример тела body:
+    {
+        "email": "string",
+        "username": "string"
+    }
+    """
     permission_classes = (permissions.AllowAny,)
 
     @staticmethod
@@ -91,7 +111,6 @@ class APISignup(APIView):
         serializer = SignUpSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-
         email_body = (
             f'Доброе время суток, {user.username}.'
             f'\nКод подтвержения для доступа к API: {user.confirmation_code}'
