@@ -35,7 +35,7 @@ class UsersViewSet(viewsets.ModelViewSet):
         methods=['GET', 'PATCH'],
         detail=False,
         permission_classes=(IsAuthenticated,),
-        url_path='me', url_name='me')
+        url_path='me')
     def get_current_user_info(self, request):
         serializer = UsersSerializer(request.user)
         if request.method == 'PATCH':
@@ -58,8 +58,7 @@ class UsersViewSet(viewsets.ModelViewSet):
 class APIGetToken(APIView):
     """
     Получение JWT-токена в обмен на username и confirmation code.
-    Права доступа: Доступно без токена.
-    Пример тела body:
+    Права доступа: Доступно без токена. Пример тела запроса:
     {
         "username": "string",
         "confirmation_code": "string"
@@ -86,11 +85,9 @@ class APIGetToken(APIView):
 
 class APISignup(APIView):
     """
-    Получить код подтверждения на переданный email.
-    Права доступа: Доступно без токена.
-    Использовать имя 'me' в качестве username запрещено.
-    Поля email и username должны быть уникальными.
-    Пример тела body:
+    Получить код подтверждения на переданный email. Права доступа: Доступно без
+    токена. Использовать имя 'me' в качестве username запрещено. Поля email и
+    username должны быть уникальными. Пример тела запроса:
     {
         "email": "string",
         "username": "string"

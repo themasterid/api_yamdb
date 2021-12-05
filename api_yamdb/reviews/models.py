@@ -20,7 +20,6 @@ ROLE_CHOICES = [
 
 class User(AbstractUser):
     username = models.CharField(
-        'имя пользователя',
         validators=(validate_username,),
         max_length=150,
         unique=True,
@@ -28,7 +27,6 @@ class User(AbstractUser):
         null=False
     )
     email = models.EmailField(
-        'электронная почта',
         max_length=254,
         unique=True,
         blank=False,
