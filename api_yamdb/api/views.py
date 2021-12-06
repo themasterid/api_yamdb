@@ -122,6 +122,9 @@ class APISignup(APIView):
 
 
 class CategoryViewSet(ModelMixinSet):
+    """
+    Получить список всех категорий. Права доступа: Доступно без токена
+    """
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (IsAdminUserOrReadOnly,)
@@ -131,6 +134,9 @@ class CategoryViewSet(ModelMixinSet):
 
 
 class GenreViewSet(ModelMixinSet):
+    """
+    Получить список всех жанров. Права доступа: Доступно без токена
+    """
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (IsAdminUserOrReadOnly,)
@@ -140,6 +146,9 @@ class GenreViewSet(ModelMixinSet):
 
 
 class TitleViewSet(ModelViewSet):
+    """
+    Получить список всех объектов. Права доступа: Доступно без токена
+    """
     queryset = Title.objects.annotate(
         rating=Avg('reviews__score')
     ).all()
