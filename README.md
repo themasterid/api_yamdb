@@ -5,9 +5,9 @@
 Список категорий (Category) может быть расширен (например, можно добавить категорию «Изобразительное искусство» или «Ювелирка»).
 
 Команда разработки:
-- :white_check_mark: [themasterid роль Тимлид разработчик 1](https://github.com/themasterid)
-- :white_check_mark: [EvgenyAlexandrov роль разработчик 2](https://github.com/EvgenyAlexandrov)
-- :white_check_mark: [madpenguinw роль разработчик 3](https://github.com/madpenguinw)
+- :white_check_mark: [themasterid (в роли Python-разработчика Тимлид - разработчик 1)](https://github.com/themasterid)
+- :white_check_mark: [EvgenyAlexandrov (в роли Python-разработчика - разработчик 2)](https://github.com/EvgenyAlexandrov)
+- :white_check_mark: [madpenguinw роль (в роли Python-разработчика - разработчик 3)](https://github.com/madpenguinw)
 
 Сами произведения в YaMDb не хранятся, здесь нельзя посмотреть фильм или послушать музыку.
 
@@ -338,6 +338,6 @@ PATCH /api/v1/users/me/ - Изменение данных своей учетн�
 Проект сделан в рамках учебного процеса по специализации Python-разработчик (back-end) Яндекс.Практикум.
 
 Авторы в рамка учебного курса ЯП:
-- :white_check_mark: [themasterid роль Тимлид разработчик 1](https://github.com/themasterid)
-- :white_check_mark: [EvgenyAlexandrov роль разработчик 2](https://github.com/EvgenyAlexandrov)
-- :white_check_mark: [madpenguinw роль разработчик 3](https://github.com/madpenguinw)
+- :white_check_mark: [themasterid (в роли Python-разработчика Тимлид - разработчик 1)](https://github.com/themasterid)
+- :white_check_mark: [EvgenyAlexandrov (в роли Python-разработчика - разработчик 2)](https://github.com/EvgenyAlexandrov)
+- :white_check_mark: [madpenguinw роль (в роли Python-разработчика - разработчик 3)](https://github.com/madpenguinw)
