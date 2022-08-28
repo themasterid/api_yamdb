@@ -110,12 +110,12 @@ class APISignup(APIView):
         user = serializer.save()
         email_body = (
             f'Доброе время суток, {user.username}.'
-            f'\nКод подтвержения для доступа к API: {user.confirmation_code}'
+            f'\nКод подтверждения для доступа к API: {user.confirmation_code}'
         )
         data = {
             'email_body': email_body,
             'to_email': user.email,
-            'email_subject': 'Код подтвержения для доступа к API!'
+            'email_subject': 'Код подтверждения для доступа к API!'
         }
         self.send_email(data)
         return Response(serializer.data, status=status.HTTP_200_OK)
