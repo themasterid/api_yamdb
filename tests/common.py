@@ -46,9 +46,8 @@ def create_categories(admin_client):
 
 
 def create_genre(admin_client):
-    result = []
     data = {'name': 'Ужасы', 'slug': 'horror'}
-    result.append(data)
+    result = [data]
     admin_client.post('/api/v1/genres/', data=data)
     data = {'name': 'Комедия', 'slug': 'comedy'}
     result.append(data)
@@ -62,12 +61,11 @@ def create_genre(admin_client):
 def create_titles(admin_client):
     genres = create_genre(admin_client)
     categories = create_categories(admin_client)
-    result = []
     data = {'name': 'Поворот туда', 'year': 2000, 'genre': [genres[0]['slug'], genres[1]['slug']],
             'category': categories[0]['slug'], 'description': 'Крутое пике'}
     response = admin_client.post('/api/v1/titles/', data=data)
     data['id'] = response.json()['id']
-    result.append(data)
+    result = [data]
     data = {'name': 'Проект', 'year': 2020, 'genre': [genres[2]['slug']], 'category': categories[1]['slug'],
             'description': 'Главная драма года'}
     response = admin_client.post('/api/v1/titles/', data=data)
@@ -86,7 +84,7 @@ def create_reviews(admin_client, admin):
     user, moderator = create_users_api(admin_client)
     client_user = auth_client(user)
     client_moderator = auth_client(moderator)
-    result = list()
+    result = []
     result.append({'id': create_review(admin_client, titles[0]["id"], 'qwerty', 5),
                    'author': admin.username, 'text': 'qwerty', 'score': 5})
     result.append({'id': create_review(client_user, titles[0]["id"], 'qwerty123', 3),
@@ -105,7 +103,7 @@ def create_comments(admin_client, admin):
     reviews, titles, user, moderator = create_reviews(admin_client, admin)
     client_user = auth_client(user)
     client_moderator = auth_client(moderator)
-    result = list()
+    result = []
     result.append({'id': create_comment(admin_client, titles[0]["id"], reviews[0]["id"], 'qwerty'),
                    'author': admin.username, 'text': 'qwerty'})
     result.append({'id': create_comment(client_user, titles[0]["id"], reviews[0]["id"], 'qwerty123'),
