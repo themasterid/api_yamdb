@@ -1,4 +1,4 @@
-requests==2.26.0
+requests==2.31.0
 django==2.2.28
 djangorestframework==3.12.4
 djangorestframework-simplejwt==5.0.0
