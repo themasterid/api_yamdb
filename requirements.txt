@@ -1,8 +1,8 @@
-requests==2.32.2
-django==3.2.25
+requests==2.32.3
+django==5.1.1
 djangorestframework==3.15.2
-djangorestframework-simplejwt==5.0.0
-PyJWT==2.4.0
+djangorestframework-simplejwt==5.3.1
+PyJWT==2.9.0
 pytest==6.2.4
 pytest-django==4.4.0
 pytest-pythonpath==0.7.3
