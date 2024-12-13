@@ -5,7 +5,7 @@
 Список категорий (Category) может быть расширен (например, можно добавить категорию «Изобразительное искусство» или «Ювелирка»).
 
 Команда разработки:
-- :white_check_mark: [themasterid (в роли Python-разработчика Тимлид - разработчик 1)](https://github.com/themasterid)
+- :white_check_mark: [Dmitriy K (в роли Python-разработчика Тимлид - разработчик 1)](https://github.com/themasterid)
 - :white_check_mark: [EvgenyAlexandrov (в роли Python-разработчика - разработчик 2)](https://github.com/EvgenyAlexandrov)
 - :white_check_mark: [madpenguinw роль (в роли Python-разработчика - разработчик 3)](https://github.com/madpenguinw)
 
